@@ -1,5 +1,10 @@
 import React from 'react'
+import { useState } from 'react';
 import { Link } from 'react-router-dom'
+
+import{createUserWithEmailAndPassword} from 'firebase/auth';
+import {auth} from "../firebase/firebaseConfig";
+
 
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
@@ -12,102 +17,168 @@ import InputGroup from 'react-bootstrap/InputGroup';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGoogle  ,faFacebook} from '@fortawesome/free-brands-svg-icons'
+import { error } from 'console';
+
 
 
 
 function SignUp() {
 
-  const formStyle ={
-    height:'70px', 
-    border:"2px solid",
+  interface FormData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }
+
+  const [formData, setFormData] = useState<FormData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  });
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+
+    const maxLengths : {[key:string]:number}={
+      firstName: 20,
+      lastName: 20,
+      email: 50,
+      password: 30,
     };
 
-    const cardStyle={
-        width:'5rem' ,
-        height:'3rem',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        cursor:"pointer"
+
+    if(value.length <= (maxLengths[name] || Infinity)){
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    }
+    else{
+      alert("Lütfen Karakter Sınırını Aşmayınız !")
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if(!formData.firstName || !formData.lastName || !formData.email || !formData.password){
+      alert("Lütfen tüm alanları doldurunuz.");
+      return;
+    }
+    try{
+      await createUserWithEmailAndPassword(auth,formData.email,formData.password);
+      const user = auth.currentUser;
+      alert("Kayıt Başarılı !");   
+    }catch(e){
+      alert(e);
     }
 
-    const a =():void=>{ console.log("button click"); }
+  };
+
+  const formStyle = {
+    height: '70px',
+    border: '2px solid',
+  };
+
+  const cardStyle = {
+    width: '5rem',
+    height: '3rem',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+  };
+
+  const handleSocialClick = (): void => {
+    console.log('Social button click');
+  };
 
   return (
     <Container>
-    <Row>
-      <Col style={{ marginTop: '30px' }} className="text-center">
-        <h1>WELCOME BACK !</h1>
-      </Col>
-    </Row>
-    <Row>
-      <Stack style={{ marginTop: '30px' }} direction="horizontal" className='justify-content-center' gap={2}>
-      <h4>Already have an account ?</h4>
+      <Row>
+        <Col style={{ marginTop: '30px' }} className="text-center">
+          <h1>WELCOME BACK !</h1>
+        </Col>
+      </Row>
+      <Row>
+        <Stack style={{ marginTop: '30px' }} direction="horizontal" className="justify-content-center" gap={2}>
+          <h4>Already have an account?</h4>
+          <h6 style={{ cursor: 'pointer' }} onClick={handleSocialClick}>
+            Sign In
+          </h6>
+        </Stack>
+      </Row>
+      <Row>
+        <Col md={6} lg={5} className="mx-auto">
+          <Form onSubmit={handleSubmit} style={{ marginTop: '20px' }} className="justify-content-center">
+            <Row>
+              <Col>
+                <Form.Group className="mb-3">
+                  <Form.Control
+                    onChange={handleChange}
+                    name="firstName"
+                    value={formData.firstName}
+                    style={formStyle}
+                    className="bg-light text-black"
+                    placeholder="First Name"
+                  />
+                </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group className="mb-3">
+                  <Form.Control
+                    onChange={handleChange}
+                    name="lastName"
+                    value={formData.lastName}
+                    style={formStyle}
+                    className="bg-light text-black"
+                    placeholder="Last Name"
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
 
-      <h6 style={{cursor:"pointer"}} onClick={a}>Sign In</h6>
+            <Form.Group className="mb-3" controlId="formGroupEmail">
+              <Form.Control
+                type="email"
+                name="email"
+                onChange={handleChange}
+                value={formData.email}
+                placeholder="Email"
+                style={formStyle}
+                className="bg-light text-dark"
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formGroupPassword">
+              <Form.Control
+                type="password"
+                name="password"
+                onChange={handleChange}
+                value={formData.password}
+                placeholder="Password"
+                style={formStyle}
+                className="bg-light text-black"
+              />
+            </Form.Group>
+            <Button style={{ width: '18rem' }} className="mb-3" variant="dark" size="lg" type="submit">
+              Sign Up
+            </Button>
+          </Form>
+          <hr style={{ border: '1.5px solid black', marginTop: '5px' }} />
+        </Col>
+      </Row>
+      <Stack direction="horizontal" className="justify-content-center" gap={5}>
+        <Card onClick={handleSocialClick} style={cardStyle}>
+          <FontAwesomeIcon icon={faGoogle} size="2x" />
+        </Card>
+        <Card onClick={handleSocialClick} style={cardStyle}>
+          <FontAwesomeIcon icon={faFacebook} size="2x" />
+        </Card>
       </Stack>
-     
-    </Row>
-    <Row>
-      <Col md={6} lg={5} className="mx-auto"> 
-
-        <Form style={{ marginTop: '20px' }} className='justify-content-center'>
-             
-             <Row>
-             <Col>
-             <Form.Group className="mb-3">
-   
-              <Form.Control
-              style={formStyle}
-              className='bg-light text-black'
-                placeholder='First Name'></Form.Control>
-             </Form.Group>
-             </Col>
-             <Col>
-             <Form.Group className="mb-3"> 
-              <Form.Control
-              style={formStyle}
-              className='bg-light text-black'
-              placeholder='Last Name'></Form.Control>
-             </Form.Group>
-             </Col>
-             </Row>
-
-          <Form.Group className="mb-3" controlId="formGroupEmail">
-            <Form.Control 
-              type="email" 
-              placeholder="Email"
-              style={formStyle}
-              className='bg-light text-dark'
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formGroupPassword">
-            <Form.Control 
-              type="password" 
-              placeholder="Password"
-              style={formStyle}
-              className='bg-light text-black'
-            />
-            
-          </Form.Group>
-        </Form>
-        <Button style={{width:"18rem"}} className='mb-3' variant="dark" size='lg'>Login</Button>
-        <hr style={{border:"1.5px solid black" , marginTop:"5px" }}></hr>
-      </Col>
-    </Row>
-    <Stack direction="horizontal" className='justify-content-center' gap={5} >
-      <Card onClick={a} style={cardStyle}>
-          <FontAwesomeIcon icon={faGoogle} size='2x' />
-      
-      </Card>
-      <Card onClick={a} style={cardStyle}>
-          <FontAwesomeIcon icon={faFacebook} size='2x' />
-      
-      </Card>
-
- </Stack>
-  </Container>
-  )
+    </Container>
+  );
 }
 
-export default SignUp
+export default SignUp;
