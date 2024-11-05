@@ -2,8 +2,7 @@ import React from 'react'
 import { useState } from 'react';
 import { Link } from 'react-router-dom'
 
-import{createUserWithEmailAndPassword} from 'firebase/auth';
-import {auth} from "../firebase/firebaseConfig";
+import { doCreateUserWithEmailAndPassword , doSıgnUpWithFacebook, doSıgnUpWithGoogle} from '../firebase/auth';
 
 
 import Form from 'react-bootstrap/Form';
@@ -18,8 +17,6 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGoogle  ,faFacebook} from '@fortawesome/free-brands-svg-icons'
 import { error } from 'console';
-
-
 
 
 function SignUp() {
@@ -67,14 +64,11 @@ function SignUp() {
       alert("Lütfen tüm alanları doldurunuz.");
       return;
     }
-    try{
-      await createUserWithEmailAndPassword(auth,formData.email,formData.password);
-      const user = auth.currentUser;
-      alert("Kayıt Başarılı !");   
-    }catch(e){
-      alert(e);
-    }
-
+    doCreateUserWithEmailAndPassword(
+      formData.firstName,
+      formData.lastName,
+      formData.email,
+      formData.password)
   };
 
   const formStyle = {
@@ -92,13 +86,13 @@ function SignUp() {
   };
 
   const handleSocialClick = (): void => {
-    console.log('Social button click');
+    doSıgnUpWithGoogle();
   };
 
   return (
     <Container>
       <Row>
-        <Col style={{ marginTop: '30px' }} className="text-center">
+        <Col md={6} lg={5} style={{ marginTop: '30px' }} className="mx-auto  text-center">
           <h1>WELCOME BACK !</h1>
         </Col>
       </Row>
@@ -173,7 +167,7 @@ function SignUp() {
         <Card onClick={handleSocialClick} style={cardStyle}>
           <FontAwesomeIcon icon={faGoogle} size="2x" />
         </Card>
-        <Card onClick={handleSocialClick} style={cardStyle}>
+        <Card onClick={doSıgnUpWithFacebook} style={cardStyle}>
           <FontAwesomeIcon icon={faFacebook} size="2x" />
         </Card>
       </Stack>
