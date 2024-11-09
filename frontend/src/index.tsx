@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import Login from './pages/signInPage';
 import SignUp from './pages/signUpPage';
+import HomePage from './pages/homePage';
 
 
 
@@ -15,7 +16,7 @@ import {
 const router = createBrowserRouter([
   {
       path:"/",
-      element:<div>HELLOOO </div>,
+      element:<HomePage></HomePage>,
       errorElement:<div>OPPSS ERROR </div>
 },
 

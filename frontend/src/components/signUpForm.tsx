@@ -99,7 +99,7 @@ function SignUp() {
       <Row>
         <Stack style={{ marginTop: '30px' }} direction="horizontal" className="justify-content-center" gap={2}>
           <h4>Already have an account?</h4>
-          <h6 style={{ cursor: 'pointer' }} onClick={handleSocialClick}>
+          <h6 style={{ cursor: 'pointer' }} onClick={()=>window.location.href="/login"}>
             Sign In
           </h6>
         </Stack>

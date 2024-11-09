@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import Form from 'react-bootstrap/Form';
@@ -9,12 +9,61 @@ import Container from 'react-bootstrap/Container';
 import Stack from 'react-bootstrap/Stack';
 import Card from 'react-bootstrap/Card';
 
+import { signInWithEmail , doSıgnUpWithFacebook, doSıgnUpWithGoogle} from '../firebase/auth';
+
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGoogle  ,faFacebook} from '@fortawesome/free-brands-svg-icons'
 
 
  
 function SignIn() {
+
+    interface FormData{
+      email:string;
+      password:string;
+    }
+
+    const [formData,setFormData] = useState<FormData>({
+      email: '',
+      password: '',
+    })
+    
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = event.target;
+  
+      const maxLengths : {[key:string]:number}={
+        firstName: 20,
+        lastName: 20,
+        email: 50,
+        password: 30,
+      };
+  
+  
+      if(value.length <= (maxLengths[name] || Infinity)){
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          [name]: value,
+        }));
+      }
+      else{
+        alert("Lütfen Karakter Sınırını Aşmayınız !")
+      }
+    };
+
+    const handleSubmit = async (event:React.FormEvent)=>{
+      event.preventDefault();
+
+      if(!formData.email || !formData.password){
+        alert("Please fill in all field!.");
+        return;
+      }
+      signInWithEmail(formData.email,formData.password)
+
+
+
+    }
+
 
     const formStyle ={
     height:'70px', 
@@ -44,43 +93,49 @@ function SignIn() {
         <Stack style={{ marginTop: '30px' }} direction="horizontal" className='justify-content-center' gap={2}>
         <h4>Don’t have an account yet ?</h4>
 
-        <h6 style={{cursor:"pointer"}} onClick={a}>Sign Up</h6>
+        <h6 style={{cursor:"pointer"}} onClick={()=>window.location.href="signup"}>Sign Up</h6>
 
         </Stack>
        
       </Row>
       <Row>
         <Col md={6} lg={5} className="mx-auto"> 
-          <Form style={{ marginTop: '20px' }} className='justify-content-center'>
+          <Form onSubmit={handleSubmit} style={{ marginTop: '20px' }} className='justify-content-center'>
             <Form.Group className="mb-3" controlId="formGroupEmail">
               <Form.Control 
+                onChange={handleChange}
+                name="email"
                 type="email" 
                 placeholder="Email"
+                value={formData.email}
                 style={formStyle}
                 className='bg-light text-dark'
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formGroupPassword">
               <Form.Control 
+                onChange={handleChange}
                 type="password" 
+                name="password"
                 placeholder="Password"
+                value={formData.password}
                 style={formStyle}
                 className='bg-light text-black'
               />
               
             </Form.Group>
-          
+            <Button style={{width:"18rem"}} className='mb-3' variant="dark" size='lg' type='submit'>Login</Button>
+
           </Form>
-          <Button style={{width:"18rem"}} className='mb-3' variant="dark" size='lg'>Login</Button>
           <hr style={{border:"1.5px solid black" , marginTop:"5px" }}></hr>
         </Col>
       </Row>
       <Stack direction="horizontal" className='justify-content-center' gap={5} >
-        <Card onClick={a} style={cardStyle}>
+        <Card onClick={doSıgnUpWithGoogle} style={cardStyle}>
             <FontAwesomeIcon icon={faGoogle} size='2x' />
         
         </Card>
-        <Card onClick={a} style={cardStyle}>
+        <Card onClick={doSıgnUpWithFacebook} style={cardStyle}>
             <FontAwesomeIcon icon={faFacebook} size='2x' />
         
         </Card>
